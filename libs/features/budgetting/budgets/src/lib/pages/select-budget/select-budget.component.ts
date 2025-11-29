@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, inject, signal, computed, effect } from '@angular/core';
+import { Component, OnInit, ViewChild, inject, signal, computed, effect, ChangeDetectionStrategy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { toSignal } from '@angular/core/rxjs-interop';
 
@@ -19,6 +19,7 @@ import { CreateBudgetModalComponent } from '../../components/create-budget-modal
   templateUrl: './select-budget.component.html',
   styleUrls: ['./select-budget.component.scss', 
               '../../components/budget-view-styles.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 /** List of all active budgets on the system. */
 export class SelectBudgetPageComponent implements OnInit
