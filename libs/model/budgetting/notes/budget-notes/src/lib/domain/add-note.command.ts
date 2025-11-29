@@ -1,6 +1,8 @@
-export interface AddNoteToBudgetCommand {
-  budgetId: string;
-  content: string;
-  authorId: string;
-  timestamp?: Date;
+export class AddNoteToBudgetCommand {
+  constructor(
+    public budgetId: string,
+    public content: string,
+    public authorId: string,
+    public timestamp?: Date
+  ) {}
 }
