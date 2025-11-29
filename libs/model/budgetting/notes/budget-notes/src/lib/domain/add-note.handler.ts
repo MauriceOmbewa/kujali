@@ -14,8 +14,16 @@ export interface AddNoteToBudgetResult {
   error?: string;
 }
 
-export class AddNoteToBudgetHandler extends FunctionHandler<AddNoteToBudgetCommand, AddNoteToBudgetResult> 
-  implements ICommandHandler<AddNoteToBudgetCommand> {
+interface BudgetNote {
+  id?: string;
+  budgetId: string;
+  content: string;
+  authorId: string;
+  timestamp: Date;
+  createdAt: Date;
+}
+
+export class AddNoteToBudgetHandler extends FunctionHandler<AddNoteToBudgetCommand, AddNoteToBudgetResult> {
   
   async execute(command: AddNoteToBudgetCommand, context: FunctionContext, tools: HandlerTools): Promise<AddNoteToBudgetResult> {
     try {
@@ -34,12 +42,12 @@ export class AddNoteToBudgetHandler extends FunctionHandler<AddNoteToBudgetComma
         };
       }
 
-      // Get repository from tools
-      const repository = tools.getRepository('notes');
+      // Get repository using proper path pattern
+      const notesPath = `budgets/${command.budgetId}/notes`;
+      const repository = tools.getRepository<BudgetNote>(notesPath);
       
       // Create note object
-      const note = {
-        id: tools.generateId(),
+      const note: BudgetNote = {
         budgetId: command.budgetId,
         content: command.content.trim(),
         authorId: command.authorId,
@@ -47,17 +55,18 @@ export class AddNoteToBudgetHandler extends FunctionHandler<AddNoteToBudgetComma
         createdAt: new Date()
       };
 
-      // Save to repository
-      await repository.addNote(note);
+      // Save to repository using create method
+      const result = await repository.create(note);
+      const noteId = result.id || Date.now().toString();
 
       return {
         success: true,
-        noteId: note.id
+        noteId: noteId
       };
     } catch (error) {
       return {
         success: false,
-        error: `Failed to add note: ${error.message}`
+        error: `Failed to add note: ${error instanceof Error ? error.message : 'Unknown error'}`
       };
     }
   }
